@@ -169,6 +169,13 @@ public class ItemUtils {
 		return item;
 	}
 	
+	public static ItemStack addEnchantment(ItemStack item, Enchantment ench, int level) {
+		if(ench == null) return item;
+		if(item == null) return item;
+		item.addUnsafeEnchantment(ench, level);
+		return item;
+	}
+	
 	public static ItemStack modifyItem(ItemStack item, String name, Map<Enchantment, Integer> ench, String[] lore, boolean unbreakable, boolean hideFlags) {
 		item = addEnchants(item, ench);
 		ItemMeta meta = item.getItemMeta();

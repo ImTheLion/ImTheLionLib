@@ -9,8 +9,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -25,6 +28,7 @@ public class BaseGUI implements Listener, Cloneable {
 	private final Map<InventoryAnimation, Integer> animations= new HashMap<>();
 	private final List<Object> linked = new ArrayList<>();
 	private boolean autoCancel = false;
+	private boolean unregisterOnClose = false;
 	
 	public BaseGUI(Plugin plugin, int size, String name) {
 		this.plugin = plugin;
@@ -148,6 +152,22 @@ public class BaseGUI implements Listener, Cloneable {
 		if(!actions.containsKey(e.getSlot())) return;
 		actions.get(e.getSlot()).onClick(e);
 		((Player)e.getWhoClicked()).updateInventory();
+	}
+
+	public boolean isUnregisterOnClose() {
+		return unregisterOnClose;
+	}
+
+	public void setUnregisterOnClose(boolean unregisterOnClose) {
+		this.unregisterOnClose = unregisterOnClose;
+	}
+	
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onClose(InventoryCloseEvent e) {
+		if(!this.unregisterOnClose) return;
+		if(!e.getInventory().equals(this.inv)) return;
+		if(!e.getViewers().isEmpty()) return;
+		HandlerList.unregisterAll(this);
 	}
 	
 
